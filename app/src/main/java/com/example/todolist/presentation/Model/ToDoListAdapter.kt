@@ -3,8 +3,12 @@ package com.example.todolist.presentation.Model
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.AdapterView.OnItemLongClickListener
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.todolist.R
 import com.example.todolist.data.ShopItem
@@ -18,6 +22,12 @@ class ShopListAdapter : RecyclerView.Adapter<ShopListAdapter.ShopItemViewHolder>
             field = value
             notifyDataSetChanged()
         }
+
+    var onItemLongClickListener:((shopItem:ShopItem)->Unit)?=null
+    var onItemClickListener:((shopItem:ShopItem)->Unit)?=null
+
+
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ShopItemViewHolder {
         val layout = when (viewType) {
@@ -39,11 +49,24 @@ class ShopListAdapter : RecyclerView.Adapter<ShopListAdapter.ShopItemViewHolder>
         val shopItem = shopList[position]
 
         viewHolder.view.setOnLongClickListener {
+            onItemLongClickListener?.invoke(shopItem)
             true
         }
+        viewHolder.view.setOnClickListener() {
+            onItemClickListener?.invoke(shopItem)
+            true
+        }
+
+
+
+
+
+
+
         viewHolder.tvName.text = shopItem.name
         viewHolder.tvCount.text = shopItem.count.toString()
 
+ 
     }
 
     override fun onViewRecycled(viewHolder: ShopItemViewHolder) {
@@ -70,6 +93,8 @@ class ShopListAdapter : RecyclerView.Adapter<ShopListAdapter.ShopItemViewHolder>
         val tvName = view.findViewById<TextView>(R.id.tv_name)
         val tvCount = view.findViewById<TextView>(R.id.tv_count)
     }
+
+
 
     companion object {
         const val IS_ENABLED = 1

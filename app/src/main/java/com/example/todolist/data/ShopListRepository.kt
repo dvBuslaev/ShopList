@@ -37,6 +37,11 @@ object ShopListRepositoryImpl {
         shopList.remove(oldElement)
         addShopItem(shopItem)
     }
+    fun changeEnableState(shopItem: ShopItem){
+        editShopItem(shopItem.copy(enabled=!shopItem.enabled))
+        updateList()
+
+    }
 
    fun getShopItem(shopItemId: Int): ShopItem {
         return shopList.find {
