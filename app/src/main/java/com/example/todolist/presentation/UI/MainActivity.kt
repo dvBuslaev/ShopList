@@ -1,12 +1,12 @@
 package com.example.todolist.presentation.UI
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.todolist.R
-import com.example.todolist.data.ShopItem
 import com.example.todolist.presentation.Model.MainViewModel
 import com.example.todolist.presentation.Model.ShopListAdapter
 
@@ -20,7 +20,7 @@ class MainActivity : AppCompatActivity() {
         setupRecyclerView()
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         viewModel.shopList.observe(this) {
-            shopListAdapter.shopList = it
+            shopListAdapter.submitList(it)
         }
     }
 
@@ -40,40 +40,50 @@ class MainActivity : AppCompatActivity() {
         }
         setupLongClickListener()
         setupClickListener()
+        Log.d("setupRecyclerView", "setupRecyclerView")
         setupSwipeMotion(rvShopList)
 
     }
 
     private fun setupLongClickListener() {
-        shopListAdapter.onItemLongClickListener = {
+        shopListAdapter.onShopItemLongClickListener = {
             viewModel.changeEnableState(it)
         }
     }
 
     private fun setupClickListener() {
-        shopListAdapter.onItemClickListener = {
+        shopListAdapter.onShopItemClickListener = {
 
         }
     }
 
     private fun setupSwipeMotion(rvShopList: RecyclerView?) {
-        val callback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+        val callback = object : ItemTouchHelper.SimpleCallback(
+            0,
+            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+        ) {
+
             override fun onMove(
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder,
                 target: RecyclerView.ViewHolder
             ): Boolean {
+                Log.d("onMove", "onMove")
                 return false
+
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val item = shopListAdapter.shopList[viewHolder.adapterPosition]
-                viewModel.deleteShopItem(shopItem = item)
+                val item = shopListAdapter.currentList[viewHolder.adapterPosition]
+                Log.d("onSwiped", "onSwiped")
+                viewModel.deleteShopItem(item)
             }
-
         }
         val itemTouchHelper = ItemTouchHelper(callback)
+        Log.d("onSwiped1", "onSwiped1")
         itemTouchHelper.attachToRecyclerView(rvShopList)
     }
+
 }
+
 

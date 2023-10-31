@@ -1,5 +1,6 @@
 package com.example.todolist.data
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import kotlin.random.Random
@@ -19,7 +20,7 @@ object ShopListRepositoryImpl {
         }
     }
 
-     fun addShopItem(shopItem: ShopItem) {
+    fun addShopItem(shopItem: ShopItem) {
         if (shopItem.id == ShopItem.UNDEFINED_ID) {
             shopItem.id = autoIncrementId++
         }
@@ -27,29 +28,25 @@ object ShopListRepositoryImpl {
         updateList()
     }
 
-     fun deleteShopItem(shopItem: ShopItem) {
+    fun deleteShopItem(shopItem: ShopItem) {
+        Log.d("deleteShopItem","intex=${shopList.indexOf(shopItem)}")
         shopList.remove(shopItem)
         updateList()
     }
 
-     fun editShopItem(shopItem: ShopItem) {
+    fun editShopItem(shopItem: ShopItem) {
         val oldElement = getShopItem(shopItem.id)
         shopList.remove(oldElement)
         addShopItem(shopItem)
     }
-    fun changeEnableState(shopItem: ShopItem){
-        editShopItem(shopItem.copy(enabled=!shopItem.enabled))
-        updateList()
 
-    }
-
-   fun getShopItem(shopItemId: Int): ShopItem {
+    fun getShopItem(shopItemId: Int): ShopItem {
         return shopList.find {
             it.id == shopItemId
         } ?: throw RuntimeException("Element with id $shopItemId not found")
     }
 
-     fun getShopList(): LiveData<List<ShopItem>> {
+    fun getShopList(): LiveData<List<ShopItem>> {
         return shopListLD
     }
 

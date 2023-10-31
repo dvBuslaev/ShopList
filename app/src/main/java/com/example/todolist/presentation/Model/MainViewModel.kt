@@ -1,5 +1,6 @@
 package com.example.todolist.presentation.Model
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.example.todolist.data.ShopItem
 import com.example.todolist.data.ShopListRepositoryImpl
@@ -14,6 +15,7 @@ class MainViewModel : ViewModel() {
     val shopList = repository.getShopList()
 
     fun deleteShopItem(shopItem: ShopItem) {
+        Log.d("MainViewModel","deleteShopItem")
         repository.deleteShopItem(shopItem)
     }
 
