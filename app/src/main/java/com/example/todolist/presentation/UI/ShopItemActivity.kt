@@ -2,8 +2,10 @@ package com.example.todolist.presentation.UI
 
 import android.content.Context
 import android.content.Intent
-import android.content.Intent.parseIntent
+
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
@@ -30,6 +32,96 @@ class ShopItemActivity : AppCompatActivity() {
         parseIntent()
         viewModel = ViewModelProvider(this)[ShopItemViewModel::class.java]
         initViews()
+        when (screenMode) {
+            MODE_ADD -> lounchAddMode()
+            MODE_EDIT -> lounchEditMode()
+        }
+        setupTextListeners()
+        observeViewModel()
+
+
+    }
+
+    private fun observeViewModel() {
+
+        viewModel.errorInputCount.observe(this) {
+            val massage = if (it) {
+                getString(R.string.error_input_count)
+            } else {
+                null
+
+            }
+            tilCount.error = massage
+        }
+        viewModel.errorInputName.observe(this) {
+            val massage = if (it) {
+                getString(R.string.error_input_name)
+            } else {
+                null
+
+            }
+            tilName.error = massage
+        }
+        viewModel.shouldCloseScreen.observe(this) {
+            finish()
+        }
+    }
+
+    private fun setupTextListeners() {
+        etName.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(
+                s: CharSequence?, start: Int, count: Int, after: Int
+            ) {
+
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                viewModel.resetErrorInputName()
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+
+            }
+
+        })
+        etCount.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(
+                s: CharSequence?, start: Int, count: Int, after: Int
+            ) {
+
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                viewModel.resetErrorInputCount()
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+
+            }
+
+        })
+    }
+
+    private fun lounchEditMode() {
+        viewModel.getShopItem(shopItemId)
+        viewModel.shopItem.observe(this) {
+            etName.setText(it.name)
+            etCount.setText(it.count.toString())
+        }
+        buttonSave.setOnClickListener {
+            val name = etName.text?.toString()
+            val count = etCount.text?.toString()
+            viewModel.editShopItem(name, count)
+        }
+    }
+
+    private fun lounchAddMode() {
+
+        buttonSave.setOnClickListener {
+            val name = etName.text?.toString()
+            val count = etCount.text?.toString()
+            viewModel.addShopItem(name, count)
+        }
 
     }
 
@@ -56,6 +148,7 @@ class ShopItemActivity : AppCompatActivity() {
 
         }
     }
+
     private fun parseIntent() {
         if (!intent.hasExtra(EXTRA_SCREEN_MODE)) {
             throw RuntimeException("Param screen mode is absent")
@@ -72,12 +165,13 @@ class ShopItemActivity : AppCompatActivity() {
             shopItemId = intent.getIntExtra(SHOP_ITEM, ShopItem.UNDEFINED_ID)
         }
     }
-    private fun initViews(){
-        tilName=findViewById(R.id.til_name)
-        tilCount=findViewById(R.id.til_count)
-        etName=findViewById(R.id.et_name)
-        etCount=findViewById(R.id.et_count)
-        buttonSave=findViewById(R.id.save_button)
+
+    private fun initViews() {
+        tilName = findViewById(R.id.til_name)
+        tilCount = findViewById(R.id.til_count)
+        etName = findViewById(R.id.et_name)
+        etCount = findViewById(R.id.et_count)
+        buttonSave = findViewById(R.id.save_button)
     }
 
 }

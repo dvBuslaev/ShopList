@@ -11,11 +11,10 @@ class MainViewModel : ViewModel() {
     private val repository = ShopListRepositoryImpl
 
 
-
     val shopList = repository.getShopList()
 
     fun deleteShopItem(shopItem: ShopItem) {
-        Log.d("MainViewModel","deleteShopItem")
+        Log.d("MainViewModel", "deleteShopItem")
         repository.deleteShopItem(shopItem)
     }
 
@@ -23,5 +22,7 @@ class MainViewModel : ViewModel() {
         val newItem = shopItem.copy(enabled = !shopItem.enabled)
         repository.editShopItem(newItem)
     }
-}
+
+
+    }
 
