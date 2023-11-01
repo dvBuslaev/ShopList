@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.todolist.R
 import com.example.todolist.presentation.Model.MainViewModel
 import com.example.todolist.presentation.Model.ShopListAdapter
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class MainActivity : AppCompatActivity() {
     private lateinit var viewModel: MainViewModel
@@ -22,6 +23,13 @@ class MainActivity : AppCompatActivity() {
         viewModel.shopList.observe(this) {
             shopListAdapter.submitList(it)
         }
+
+        val addButton = findViewById<FloatingActionButton>(R.id.button_add_shop_item)
+        addButton.setOnClickListener {
+            val intent = ShopItemActivity.setupAddIntent(this)
+            startActivity(intent)
+
+        }
     }
 
     private fun setupRecyclerView() {
@@ -30,12 +38,10 @@ class MainActivity : AppCompatActivity() {
             shopListAdapter = ShopListAdapter()
             adapter = shopListAdapter
             recycledViewPool.setMaxRecycledViews(
-                ShopListAdapter.IS_DISABLED,
-                ShopListAdapter.MAX_VIEW_POOL
+                ShopListAdapter.IS_DISABLED, ShopListAdapter.MAX_VIEW_POOL
             )
             recycledViewPool.setMaxRecycledViews(
-                ShopListAdapter.IS_ENABLED,
-                ShopListAdapter.MAX_VIEW_POOL
+                ShopListAdapter.IS_ENABLED, ShopListAdapter.MAX_VIEW_POOL
             )
         }
         setupLongClickListener()
@@ -53,14 +59,14 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupClickListener() {
         shopListAdapter.onShopItemClickListener = {
-
+            val intent = ShopItemActivity.setupEditIntent(this, it.id)
+            startActivity(intent)
         }
     }
 
     private fun setupSwipeMotion(rvShopList: RecyclerView?) {
         val callback = object : ItemTouchHelper.SimpleCallback(
-            0,
-            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+            0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
         ) {
 
             override fun onMove(
