@@ -12,17 +12,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.todolist.R
 import com.example.todolist.data.ShopItem
+import com.example.todolist.databinding.ActivityMainBinding
+import com.example.todolist.databinding.ActivityShopItemBinding
 import com.example.todolist.presentation.Model.ShopItemViewModel
 import com.google.android.material.textfield.TextInputLayout
 
 class ShopItemActivity : AppCompatActivity() {
     private lateinit var viewModel: ShopItemViewModel
 
-    private lateinit var tilName: TextInputLayout
-    private lateinit var tilCount: TextInputLayout
-    private lateinit var etName: EditText
-    private lateinit var etCount: EditText
-    private lateinit var buttonSave: Button
+    private var _binding: ActivityShopItemBinding? = null
+    private val binding: ActivityShopItemBinding
+        get() = _binding ?: throw RuntimeException("No binding")
 
     private var screenMode = MODE_UNKNOWN
     private var shopItemId = ShopItem.UNDEFINED_ID
@@ -31,7 +31,6 @@ class ShopItemActivity : AppCompatActivity() {
         setContentView(R.layout.activity_shop_item)
         parseIntent()
         viewModel = ViewModelProvider(this)[ShopItemViewModel::class.java]
-        initViews()
         when (screenMode) {
             MODE_ADD -> lounchAddMode()
             MODE_EDIT -> lounchEditMode()
@@ -51,7 +50,7 @@ class ShopItemActivity : AppCompatActivity() {
                 null
 
             }
-            tilCount.error = massage
+            binding.tilCount.error = massage
         }
         viewModel.errorInputName.observe(this) {
             val massage = if (it) {
@@ -60,7 +59,7 @@ class ShopItemActivity : AppCompatActivity() {
                 null
 
             }
-            tilName.error = massage
+            binding.tilName.error = massage
         }
         viewModel.shouldCloseScreen.observe(this) {
             finish()
@@ -68,7 +67,7 @@ class ShopItemActivity : AppCompatActivity() {
     }
 
     private fun setupTextListeners() {
-        etName.addTextChangedListener(object : TextWatcher {
+        binding.etName.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(
                 s: CharSequence?, start: Int, count: Int, after: Int
             ) {
@@ -84,7 +83,7 @@ class ShopItemActivity : AppCompatActivity() {
             }
 
         })
-        etCount.addTextChangedListener(object : TextWatcher {
+        binding.etCount.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(
                 s: CharSequence?, start: Int, count: Int, after: Int
             ) {
@@ -105,21 +104,21 @@ class ShopItemActivity : AppCompatActivity() {
     private fun lounchEditMode() {
         viewModel.getShopItem(shopItemId)
         viewModel.shopItem.observe(this) {
-            etName.setText(it.name)
-            etCount.setText(it.count.toString())
+            binding.etName.setText(it.name)
+            binding.etCount.setText(it.count.toString())
         }
-        buttonSave.setOnClickListener {
-            val name = etName.text?.toString()
-            val count = etCount.text?.toString()
+        binding.saveButton.setOnClickListener {
+            val name = binding.etName.text?.toString()
+            val count = binding.etCount.text?.toString()
             viewModel.editShopItem(name, count)
         }
     }
 
     private fun lounchAddMode() {
 
-        buttonSave.setOnClickListener {
-            val name = etName.text?.toString()
-            val count = etCount.text?.toString()
+        binding.saveButton.setOnClickListener {
+            val name = binding.etName.text?.toString()
+            val count = binding.etCount.text?.toString()
             viewModel.addShopItem(name, count)
         }
 
@@ -166,12 +165,10 @@ class ShopItemActivity : AppCompatActivity() {
         }
     }
 
-    private fun initViews() {
-        tilName = findViewById(R.id.til_name)
-        tilCount = findViewById(R.id.til_count)
-        etName = findViewById(R.id.et_name)
-        etCount = findViewById(R.id.et_count)
-        buttonSave = findViewById(R.id.save_button)
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding=null
     }
+
 
 }
